@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>قول بس لا تقول</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:#120018;
+  color:white;
+  text-align:center;
+}
+
+header{
+  padding:15px;
+  font-size:22px;
+  color:#ff9ad5;
+}
+
+button{
+  padding:10px 15px;
+  margin:5px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  background:#ff9ad5;
+  font-weight:bold;
+}
+
+.card{
+  margin:20px;
+  padding:20px;
+  background:#22003a;
+  border-radius:12px;
+  border:1px solid #ff9ad5;
+  min-height:90px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:18px;
+}
+</style>
+</head>
+
+<body>
+
+<header>🎮 قول بس لا تقول</header>
+
+<button onclick="newSentence()">🔄 جملة جديدة</button>
+<button onclick="copySentence()">📋 نسخ</button>
+<button onclick="resetGame()">♻️ إعادة تعيين</button>
+
+<div class="card" id="box">اضغط "جملة جديدة"</div>
+
+<script>
+
+/////////////////////////////////////////////////////
+// 🧠 بنك معجمي صعب
+/////////////////////////////////////////////////////
+
+const subjects = [
+"اليقين","الشك","الزمن","القدر","الواقع","الوهم","الذاكرة","الصمت",
+"الريح","الضباب","الليل","النهار","الظل","النور","الفكرة","المعنى"
+];
+
+const verbs = [
+"تهاوى","انفرط","استحال","تلاشى","تقاطَع","انكفأ","خمد","تشظّى",
+"انمحى","تردّد","انحسر","اضطرب","انطفأ","تبدّد","انغمر","انجلى"
+];
+
+const complements = [
+"تحت وطأة الغموض",
+"في لحظة الإدراك",
+"بين طيات الزمن",
+"في عتمة الدخان",
+"أمام صمتٍ ثقيل",
+"تحت ضغط الواقع",
+"داخل دوامة الفكر",
+"خلف جدار الصمت",
+"بين حدود الإدراك",
+"في مسارٍ غامض"
+];
+
+/////////////////////////////////////////////////////
+// 💾 حفظ الجمل لمنع التكرار
+/////////////////////////////////////////////////////
+
+let used = JSON.parse(localStorage.getItem("say_no_say_used")) || [];
+
+/////////////////////////////////////////////////////
+// 🎮 توليد بدون تكرار
+/////////////////////////////////////////////////////
+
+function generate(){
+
+  for(let i=0;i<500;i++){
+
+    let s = subjects[Math.floor(Math.random()*subjects.length)];
+    let v = verbs[Math.floor(Math.random()*verbs.length)];
+    let c = complements[Math.floor(Math.random()*complements.length)];
+
+    let sentence = `${v} ${s} ${c}`;
+
+    if(!used.includes(sentence)){
+      used.push(sentence);
+      localStorage.setItem("say_no_say_used", JSON.stringify(used));
+      return sentence;
+    }
+  }
+
+  return "خلصت الجمل ♻️ اضغط إعادة تعيين";
+}
+
+/////////////////////////////////////////////////////
+// 🎮 عرض
+/////////////////////////////////////////////////////
+
+function newSentence(){
+  document.getElementById("box").innerText = generate();
+}
+
+/////////////////////////////////////////////////////
+// 📋 نسخ
+/////////////////////////////////////////////////////
+
+function copySentence(){
+  navigator.clipboard.writeText(document.getElementById("box").innerText);
+  alert("تم النسخ 📋");
+}
+
+/////////////////////////////////////////////////////
+// ♻️ إعادة تعيين
+/////////////////////////////////////////////////////
+
+function resetGame(){
+  localStorage.removeItem("say_no_say_used");
+  used = [];
+  document.getElementById("box").innerText = "تمت إعادة التعيين ♻️";
+}
+
+</script>
+
+</body>
+</html>
