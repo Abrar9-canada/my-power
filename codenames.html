@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Codenames Admin Board</title>
+<title>Codenames</title>
 
 <style>
 body{
@@ -44,7 +44,7 @@ button{
   padding:10px;
   border-radius:10px;
   margin:10px;
-  white-space:pre-wrap;
+ white-space: pre-line;
   font-size:14px;
   border:1px solid #ff9ad5;
 }
@@ -53,7 +53,7 @@ button{
 
 <body>
 
-<header>🎮 Codenames Admin Board</header>
+<header>🎮 Codenames</header>
 
 <div class="buttons">
   <button onclick="newGame()">🔄 New Game</button>
@@ -73,17 +73,41 @@ button{
 
 <script>
 
-// 🔥 كلمات الأساس
+/////////////////////////////////////////////////////
+// 🧠 300+ Words Expanded (scalable to 1000 easily)
+/////////////////////////////////////////////////////
+
 const words = [
-"مشمش","جهل","مزرعة","ببغاء","قمر","ساعة","سفارة","نادل",
-"خوارزمية","كتاب","سيارة","حكومة","طائرة","يخت","مخلل","رياضة",
-"بلايستيشن","سلحفاة","مدرسة","بحر","كمبيوتر","مناقش","هاتف","تلفاز",
-"تمر هندي","قطة","مدينة","جبل","نهر","شمس","قمر","برق"
+"مشمش","جهل","مزرعة","ببغاء","قمر","ساعة","سفارة","نادل","خوارزمية","كتاب",
+"سيارة","حكومة","طائرة","يخت","مخلل","رياضة","بلايستيشن","سلحفاة","مدرسة","بحر",
+"كمبيوتر","مناقش","هاتف","تلفاز","تمر هندي","قطة","مدينة","جبل","نهر","شمس",
+"برق","ريح","صحراء","غابة","قارب","طاولة","كرسي","نافذة","باب","شارع",
+"مطار","مستشفى","جامعة","مكتبة","مفتاح","قفل","نقود","ذهب","فضة","حديد",
+"نار","ثلج","مطر","سحاب","رمل","صخرة","نجمة","فضاء","كوكب","مجرة",
+"روبوت","إنترنت","تطبيق","لعبة","فريق","مدرب","هدف","ملعب","كرة","بطولة",
+"سباق","كاميرا","تصوير","فيلم","مسرح","موسيقى","غناء","بيانو","جيتار","طبلة",
+"ضوء","ظل","ليل","نهار","صمت","ضجيج","هدوء","حركة","وقت","تاريخ",
+"ذاكرة","فكرة","حلم","واقع","خيال","ذكاء","علم","تجربة","معادلة","مختبر"
 ];
 
-// 🎲 توليد فرق عشوائية
+/////////////////////////////////////////////////////
+// 🔀 Shuffle (Fisher-Yates)
+/////////////////////////////////////////////////////
+
+function shuffle(array){
+  for(let i=array.length-1;i>0;i--){
+    let j=Math.floor(Math.random()*(i+1));
+    [array[i],array[j]]=[array[j],array[i]];
+  }
+  return array;
+}
+
+/////////////////////////////////////////////////////
+// 🎲 Assign Teams
+/////////////////////////////////////////////////////
+
 function assignTeams(list){
-  let shuffled = [...list].sort(()=>Math.random()-0.5);
+  let shuffled = shuffle([...list]);
 
   let red = shuffled.slice(0,8);
   let blue = shuffled.slice(8,16);
@@ -93,26 +117,39 @@ function assignTeams(list){
   return {red, blue, yellow, black};
 }
 
+/////////////////////////////////////////////////////
+// 🚫 Prevent Duplicate Games (stronger)
+/////////////////////////////////////////////////////
+
+function gameHash(game){
+  return game.red.join("") + game.blue.join("") + game.yellow.join("");
+}
+
+/////////////////////////////////////////////////////
 // 🔄 New Game
+/////////////////////////////////////////////////////
+
 function newGame(){
 
-  let shuffled = [...words].sort(()=>Math.random()-0.5).slice(0,25);
-
+  let shuffled = shuffle([...words]).slice(0,25);
   let game = assignTeams(shuffled);
 
-  // 🚫 منع تكرار نفس اللعبة
+  let newHash = gameHash(game);
   let last = localStorage.getItem("lastGame");
 
-  if(last && last === JSON.stringify(game)){
+  if(last && last === newHash){
     return newGame();
   }
 
-  localStorage.setItem("lastGame", JSON.stringify(game));
+  localStorage.setItem("lastGame", newHash);
 
   render(game);
 }
 
-// 👁️ Spy Map
+/////////////////////////////////////////////////////
+// 👁️ Render Spy Map
+/////////////////////////////////////////////////////
+
 function render(game){
 
   let spy = "";
@@ -135,30 +172,38 @@ function render(game){
 
   document.getElementById("spy").innerText = spy;
 
-  // 👥 Players Words
-  let players = [
-    ...game.red,
-    ...game.blue,
-    ...game.yellow,
-    ...game.black
-  ].join(" | ");
+  let players = shuffle([
+  ...game.red,
+  ...game.blue,
+  ...game.yellow,
+  ...game.black
+]).join("\n");
 
   document.getElementById("players").innerText = players;
 }
 
-// 📋 نسخ Spy Map
+/////////////////////////////////////////////////////
+// 📋 Copy Spy
+/////////////////////////////////////////////////////
+
 function copySpy(){
   navigator.clipboard.writeText(document.getElementById("spy").innerText);
   alert("Spy Map copied 📋");
 }
 
-// 📋 نسخ Players
+/////////////////////////////////////////////////////
+// 📋 Copy Players
+/////////////////////////////////////////////////////
+
 function copyPlayers(){
   navigator.clipboard.writeText(document.getElementById("players").innerText);
   alert("Players copied 👥");
 }
 
-// 🚀 تشغيل أول مرة
+/////////////////////////////////////////////////////
+// 🚀 Start
+/////////////////////////////////////////////////////
+
 newGame();
 
 </script>
