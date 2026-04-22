@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>My Power</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
     body {
@@ -15,17 +16,18 @@
     header {
       padding: 20px;
       text-align: center;
-      font-size: 28px;
+      font-size: clamp(18px, 5vw, 28px);
       background: #1f0033;
       color: #ff9ad5;
       box-shadow: 0 0 15px rgba(255, 154, 213, 0.3);
     }
+    
 
     .container {
-      padding: 20px;
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 20px;
+        padding: 16px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 16px;
     }
 
     .card {
