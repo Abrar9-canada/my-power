@@ -91,7 +91,15 @@ const complements = [
 let used = JSON.parse(localStorage.getItem("say_no_say_used")) || [];
 
 /////////////////////////////////////////////////////
-// 🎮 توليد بدون تكرار
+// 🔢 حساب الكلمات
+/////////////////////////////////////////////////////
+
+function wordCount(text){
+  return text.trim().split(/\s+/).length;
+}
+
+/////////////////////////////////////////////////////
+// 🎮 توليد جملة (مع ضمان 10 كلمات)
 /////////////////////////////////////////////////////
 
 function generate(){
@@ -103,6 +111,11 @@ function generate(){
     let c = complements[Math.floor(Math.random()*complements.length)];
 
     let sentence = `${v} ${s} ${c}`;
+
+    // 🔥 نكمل الجملة لين تصير 10 كلمات
+    while(wordCount(sentence) < 10){
+      sentence += " " + complements[Math.floor(Math.random()*complements.length)];
+    }
 
     if(!used.includes(sentence)){
       used.push(sentence);
