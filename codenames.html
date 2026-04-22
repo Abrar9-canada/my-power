@@ -1,42 +1,52 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar">
 <head>
 <meta charset="UTF-8">
-<title>Codenames</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Codenames Admin Board</title>
 
 <style>
-body {
-  margin: 0;
-  font-family: Arial;
-  background: #0f001a;
-  color: white;
-  text-align: center;
+body{
+  margin:0;
+  font-family:Arial;
+  background:#12001f;
+  color:white;
 }
 
-header {
-  padding: 15px;
-  background: #1f0033;
-  color: #ff9ad5;
+header{
+  text-align:center;
+  padding:15px;
+  font-size:22px;
+  color:#ff9ad5;
 }
 
-button {
-  margin: 8px;
-  padding: 10px 12px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  background: #ff9ad5;
+.buttons{
+  text-align:center;
+  margin:10px;
 }
 
-.box {
-  background: #1a002b;
-  margin: 10px auto;
-  padding: 10px;
-  width: 90%;
-  max-width: 800px;
-  border-radius: 10px;
-  white-space: pre-wrap;
-  text-align: left;
+button{
+  padding:10px 12px;
+  margin:5px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  background:#ff9ad5;
+  font-weight:bold;
+}
+
+.section{
+  padding:15px;
+}
+
+.box{
+  background:#22003a;
+  padding:10px;
+  border-radius:10px;
+  margin:10px;
+  white-space:pre-wrap;
+  font-size:14px;
+  border:1px solid #ff9ad5;
 }
 </style>
 </head>
@@ -45,123 +55,111 @@ button {
 
 <header>🎮 Codenames Admin Board</header>
 
-<button onclick="newGame()">🔄 New Game</button>
-<button onclick="copySpy()">📋 Copy Spy Map</button>
-<button onclick="copyPlayers()">👥 Copy Players</button>
+<div class="buttons">
+  <button onclick="newGame()">🔄 New Game</button>
+  <button onclick="copySpy()">📋 Copy Spy Map</button>
+  <button onclick="copyPlayers()">👥 Copy Players</button>
+</div>
 
+<div class="section">
 <h3>👁️ Spy Map</h3>
-<div id="spy" class="box"></div>
+<div class="box" id="spy"></div>
+</div>
 
+<div class="section">
 <h3>👥 Players Words</h3>
-<div id="players" class="box"></div>
+<div class="box" id="players"></div>
+</div>
 
 <script>
 
-// 🔥 ربط مع home page
-const urlParams = new URLSearchParams(window.location.search);
-let gameId = urlParams.get("id");
-
-// إذا ما فيه نولد واحد
-if (!gameId) gameId = Date.now() + Math.random();
-
-const wordsPool = [
-"جهل","ساعة","ببغاء","نادل","يخت","مزرعة","بلايستيشن","سلحفاة",
-"رياضة","تمر هندي","مشمش","دلفين","تلفاز","آيفون","سفارة","بداية",
-"قارب","مخلل","خوارزمية","حكومة","قطة","مناقش","برق","دلع",
-"مدرسة","سيارة","قمر","بحر","كتاب","كمبيوتر","هاتف","طائرة"
+// 🔥 كلمات الأساس
+const words = [
+"مشمش","جهل","مزرعة","ببغاء","قمر","ساعة","سفارة","نادل",
+"خوارزمية","كتاب","سيارة","حكومة","طائرة","يخت","مخلل","رياضة",
+"بلايستيشن","سلحفاة","مدرسة","بحر","كمبيوتر","مناقش","هاتف","تلفاز",
+"تمر هندي","قطة","مدينة","جبل","نهر","شمس","قمر","برق"
 ];
 
-let game = [];
+// 🎲 توليد فرق عشوائية
+function assignTeams(list){
+  let shuffled = [...list].sort(()=>Math.random()-0.5);
 
-// 🔥 seed ثابت
-function mulberry(a) {
-  return function() {
-    a |= 0;
-    a = a + 0x6D2B79F5 | 0;
-    let t = Math.imul(a ^ a >>> 15, 1 | a);
-    t ^= t + Math.imul(t ^ t >>> 7, 61 | t);
-    return ((t ^ t >>> 14) >>> 0) / 4294967296;
-  }
+  let red = shuffled.slice(0,8);
+  let blue = shuffled.slice(8,16);
+  let yellow = shuffled.slice(16,24);
+  let black = shuffled.slice(24,25);
+
+  return {red, blue, yellow, black};
 }
 
-function shuffle(arr, seed) {
-  let a = [...arr];
-  let rand = mulberry(seed);
+// 🔄 New Game
+function newGame(){
 
-  for (let i = a.length - 1; i > 0; i--) {
-    let j = Math.floor(rand() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
+  let shuffled = [...words].sort(()=>Math.random()-0.5).slice(0,25);
+
+  let game = assignTeams(shuffled);
+
+  // 🚫 منع تكرار نفس اللعبة
+  let last = localStorage.getItem("lastGame");
+
+  if(last && last === JSON.stringify(game)){
+    return newGame();
   }
 
-  return a;
+  localStorage.setItem("lastGame", JSON.stringify(game));
+
+  render(game);
 }
 
-function generate() {
-  let shuffled = shuffle(wordsPool, gameId);
-  let words = shuffled.slice(0, 25);
+// 👁️ Spy Map
+function render(game){
 
-  game = words.map((w, i) => {
-    let type;
+  let spy = "";
 
-    if (i < 8) type = "🔴";
-    else if (i < 16) type = "🔵";
-    else if (i < 24) type = "🟡";
-    else type = "⚫";
-
-    return { word: w, type };
+  game.red.forEach(w=>{
+    spy += `(${w} 🔴)\n`;
   });
 
-  render();
+  game.blue.forEach(w=>{
+    spy += `(${w} 🔵)\n`;
+  });
+
+  game.yellow.forEach(w=>{
+    spy += `(${w} 🟡)\n`;
+  });
+
+  game.black.forEach(w=>{
+    spy += `(${w} ⚫)\n`;
+  });
+
+  document.getElementById("spy").innerText = spy;
+
+  // 👥 Players Words
+  let players = [
+    ...game.red,
+    ...game.blue,
+    ...game.yellow,
+    ...game.black
+  ].join(" | ");
+
+  document.getElementById("players").innerText = players;
 }
 
-// 🔥 Spy map (بالألوان)
-function renderSpy() {
-  let out = "";
-
-  for (let i = 0; i < game.length; i += 2) {
-    let a = game[i];
-    let b = game[i + 1];
-
-    if (b) {
-      out += `(${a.word} ${a.type} | ${b.word} ${b.type})\n`;
-    } else {
-      out += `(${a.word} ${a.type})\n`;
-    }
-  }
-
-  document.getElementById("spy").innerText = out;
-}
-
-// 🔥 Player words (بدون ألوان)
-function renderPlayers() {
-  let out = game.map(c => c.word).join(" | ");
-  document.getElementById("players").innerText = out;
-}
-
-function render() {
-  renderSpy();
-  renderPlayers();
-}
-
-// 🔥 نسخ الشارح
-function copySpy() {
+// 📋 نسخ Spy Map
+function copySpy(){
   navigator.clipboard.writeText(document.getElementById("spy").innerText);
-  alert("Spy Map Copied!");
+  alert("Spy Map copied 📋");
 }
 
-// 🔥 نسخ اللاعبين
-function copyPlayers() {
+// 📋 نسخ Players
+function copyPlayers(){
   navigator.clipboard.writeText(document.getElementById("players").innerText);
-  alert("Players Words Copied!");
+  alert("Players copied 👥");
 }
 
-// 🔥 لعبة جديدة (تغير كل شيء فعلياً)
-function newGame() {
-  gameId = Date.now() + Math.random();
-  generate();
-}
-
-generate();
+// 🚀 تشغيل أول مرة
+newGame();
 
 </script>
 
