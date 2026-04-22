@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>My Power</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial;
+      background: #7a0c4c;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .box {
+      background: #e2409f;
+      padding: 30px;
+      border-radius: 15px;
+      text-align: center;
+      width: 300px;
+      box-shadow: 0 0 20px rgba(255, 154, 213, 0.4);
+    }
+
+    h2 {
+      margin-bottom: 10px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 15px;
+      border-radius: 10px;
+      border: none;
+      outline: none;
+      text-align: center;
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 10px;
+      width: 100%;
+      border: none;
+      border-radius: 10px;
+      background: #7a0c4c;
+      color: white;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #5c0838;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="box">
+  <h2>🌸 أهلاً بك في عالمي</h2>
+
+  <input type="password" id="key" placeholder="ادخل كلمة المرور">
+  <button onclick="enter()">دخول</button>
+</div>
+
+<script>
+function enter() {
+  const key = document.getElementById("key").value;
+
+  if (key === "1234") {
+    // نولد ID جديد كل مرة عشان الصفحة الثانية تجيب كلمات جديدة
+    const gameId = Date.now() + Math.floor(Math.random() * 100000);
+    localStorage.setItem("gameId", gameId);
+
+    window.location.href = "home.html";
+  } else {
+    window.location.href = "puzzle.html";
+  }
+}
+</script>
+
+</body>
+</html>

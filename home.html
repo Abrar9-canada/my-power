@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Power</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial;
+      background: #140021;
+      color: white;
+    }
+
+    header {
+      padding: 20px;
+      text-align: center;
+      font-size: 28px;
+      background: #1f0033;
+      color: #ff9ad5;
+      box-shadow: 0 0 15px rgba(255, 154, 213, 0.3);
+    }
+
+    .container {
+      padding: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: #22003a;
+      padding: 20px;
+      border-radius: 15px;
+      text-align: center;
+      cursor: pointer;
+      transition: 0.3s;
+      border: 1px solid rgba(255, 154, 213, 0.2);
+    }
+
+    .card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 15px rgba(255, 154, 213, 0.4);
+    }
+
+    .card h3 {
+      color: #ff9ad5;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>⚡ My Power</header>
+
+<div class="container" id="gamesContainer"></div>
+
+<script>
+
+// 🔥 جلب gameId أو إنشاؤه
+let gameId = localStorage.getItem("gameId");
+
+if (!gameId) {
+  gameId = Date.now() + Math.random();
+  localStorage.setItem("gameId", gameId);
+}
+
+const games = [
+  { name: "Code Names", file: "codenames.html" }, // ✅ FIX هنا
+  { name: "Coming Soon", file: "#" }
+];
+
+const container = document.getElementById("gamesContainer");
+
+games.forEach(game => {
+  const div = document.createElement("div");
+  div.className = "card";
+
+  div.innerHTML = `<h3>${game.name}</h3>`;
+
+  div.onclick = () => {
+    if (game.file !== "#") {
+      // 🔥 إرسال gameId للعبة
+      window.location.href = game.file + "?id=" + gameId;
+    } else {
+      alert("Game not ready yet 🚧");
+    }
+  };
+
+  container.appendChild(div);
+});
+
+</script>
+
+</body>
+</html>
